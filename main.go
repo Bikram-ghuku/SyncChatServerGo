@@ -6,11 +6,11 @@ import (
   "gorm.io/driver/postgres"
 	"github.com/joho/godotenv"
 	"gorm.io/gorm"
+  "github.com/Bikram-ghuku/SyncChatServerGo/models"
 )
 
 var DB *gorm.DB
 func main() {
-	fmt.Println("Hello World")
   godotenv.Load()
   dbhost := os.Getenv("POSTGRES_HOST");
   dbname := os.Getenv("POSTGRES_DBNAME");
@@ -25,5 +25,6 @@ func main() {
   
   DB = db;
   fmt.Println("DB Connection Successful")
-
+  DB.AutoMigrate(&models.Users{}, &models.Chats{})
+  fmt.Println("Migration Done")
 }
