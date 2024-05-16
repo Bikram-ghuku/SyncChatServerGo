@@ -4,15 +4,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type Users struct {
-	gorm.Model
-	UserId     uuid.UUID `gorm:"primaryKey type:uuid; default:uuid_generate_v4()" json:"userid"`
-	Password   string    `json:"password"`
-	Email      string    `gorm:"unique" json:"email"`
-	Name       string    `gorm:"unique" json:"name"`
+  UserId     uuid.UUID `gorm:"primaryKey; column:user_id; type:uuid; default:uuid_generate_v4()" json:"userid"`
+	Password   string    `gorm:"not null" json:"password"`
+	Email      string    `gorm:"unique; not null" json:"email"`
+	Name       string    `gorm:"unique; not null" json:"name"`
 	Url        string    `gorm:"default:https://github.com/shadcn.png;" json:"profpic"`
-	LastOnline time.Time `json:"lastonline"`
+  LastOnline time.Time `gorm:"default:CURRENT_TIMESTAMP; not null" json:"lastonline"`
 }
