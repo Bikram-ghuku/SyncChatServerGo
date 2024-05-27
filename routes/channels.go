@@ -6,11 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupChannelsRoutes(DB *gorm.DB)*gin.Engine{
-  r := gin.Default()
-  r.POST("/channels", func(ctx *gin.Context) {
-    controllers.GetChannels(ctx, DB);
-  })
-
-  return r;
+func SetupChannelsRoutes(DB *gorm.DB, superRoute *gin.RouterGroup){
+  userRoutes := superRoute.Group("/channels")
+  {
+    userRoutes.GET("/", func(ctx *gin.Context) {
+      controllers.GetChannels(ctx, DB);
+    })
+  }
 }
