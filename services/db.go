@@ -10,8 +10,8 @@ import (
 	"gorm.io/gorm"
 )
 
-func InitDB() *gorm.DB{
-	var DB *gorm.DB;
+func InitDB() *gorm.DB {
+	var DB *gorm.DB
 	godotenv.Load()
 	dbhost := os.Getenv("POSTGRES_HOST")
 	dbname := os.Getenv("POSTGRES_DBNAME")
@@ -28,5 +28,5 @@ func InitDB() *gorm.DB{
 	fmt.Println("DB Connection Successful")
 	DB.AutoMigrate(&models.Users{}, &models.Chats{})
 	fmt.Println("Migration Done")
-  return DB;
+	return DB
 }

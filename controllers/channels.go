@@ -9,16 +9,16 @@ import (
 )
 
 type userId struct {
-  User string `form:"user"`
+	User string `form:"user"`
 }
 
-func GetChannels(c* gin.Context, DB *gorm.DB){
-  var senderData userId;
-  err := c.BindJSON(&senderData);
-  if err != nil {
-    panic("Get channels error")
-  }
+func GetChannels(c *gin.Context, DB *gorm.DB) {
+	var senderData userId
+	err := c.BindJSON(&senderData)
+	if err != nil {
+		panic("Get channels error")
+	}
 
-  DB.First(&models.Users{}, senderData);
-  c.JSON(http.StatusOK, gin.H{"data": senderData.User})
+	DB.First(&models.Users{}, senderData)
+	c.JSON(http.StatusOK, gin.H{"data": senderData.User})
 }

@@ -6,11 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupUserRoutes(DB *gorm.DB, superRoute *gin.RouterGroup){
-  userRoutes := superRoute.Group("/user")
-  {
-    userRoutes.POST("/register", func(ctx *gin.Context) {
-      controllers.Register(ctx, DB);
-    })
-  }
+func SetupUserRoutes(DB *gorm.DB, superRoute *gin.RouterGroup) {
+	userRoutes := superRoute.Group("/user")
+	{
+		userRoutes.POST("/register", func(ctx *gin.Context) {
+			controllers.Register(ctx, DB)
+		})
+	}
 }
