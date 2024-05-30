@@ -4,7 +4,9 @@
 	Sync Chat
 	<img src="" alt="" height="30" width="0px"/>
 </h3>
-
+<h5 align="center">
+Work in progress
+</h5>
 <h6 align="center">
   <a href="#-features">Features</a>
   ·
