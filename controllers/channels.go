@@ -1,24 +1,26 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/Bikram-ghuku/SyncChatServerGo/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type userId struct {
-	User string `form:"user"`
+	User string `json:"user"`
 }
 
 func GetChannels(c *gin.Context, DB *gorm.DB) {
-	var senderData userId
-	err := c.BindJSON(&senderData)
-	if err != nil {
+	senderData := userId{}
+
+	if err := c.BindJSON(&senderData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "username and password is needed"})
 		panic("Get channels error")
 	}
-
-	DB.First(&models.Users{}, senderData)
+	c.Bind(&senderData)
+	fmt.Println(senderData.User)
+	//DB.First(&models.Users{}, senderData)
 	c.JSON(http.StatusOK, gin.H{"data": senderData.User})
 }
