@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/Bikram-ghuku/SyncChatServerGo/models"
@@ -10,33 +11,24 @@ import (
 )
 
 type signUp struct {
-	Email string `form:"email"`
-	Name  string `form:"name"`
-	Pswd  string `form:"pswd"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+	Pswd  string `json:"pswd"`
 }
 
 func Register(c *gin.Context, DB *gorm.DB) {
-	var regUser signUp
-	err := c.BindJSON(&regUser)
-	if err != nil {
+	regUser := signUp{}
+
+	if err := c.BindJSON(&regUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "error in request"})
-		return
-	}
-	var findUser = models.Users{}
-	result := DB.Find(&findUser, "email = ?", regUser.Email)
-	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
-	}
-	if result.RowsAffected != 0 {
-		c.JSON(http.StatusConflict, gin.H{"message": "User already exists"})
-		return
+		panic("error in request")
 	}
 
 	hashPswd, err := services.HashPassword(regUser.Pswd)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error hashing password"})
-		return
+		panic("Error hashing password")
 	}
 
 	var newUser = models.Users{
@@ -45,10 +37,14 @@ func Register(c *gin.Context, DB *gorm.DB) {
 		Name:     regUser.Name,
 	}
 
-	resData := DB.Create(newUser)
+	fmt.Println("user: ", newUser.Email, "Password: ", newUser.Password, "Name: ", newUser.Name)
+	resData := DB.Create(&newUser)
 
 	if resData.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error creating new user"})
-		return
+		panic("Error creating new user")
 	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
+
 }
