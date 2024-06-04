@@ -8,7 +8,7 @@ else
 endif
 
 
-default: dev
+default: run
 
 .PHONY: dev dev-stop clean check_clean
 
@@ -16,13 +16,24 @@ dev:
 	@echo "Starting database"
 	@$(DOCKER_COMPOSE) up postgres-dev -d --wait
 	@echo "Starting server"
+	@cp .env backend/.env
 	@bash -c "trap 'echo "";$(MAKEQ) dev-stop; exit 0' SIGINT SIGTERM ERR; cd backend && go run .;"
 	
 dev-stop:
 	@echo ""
 	@echo "Stopping server and database"
-	@$(DOCKER_COMPOSE) down
+	@$(DOCKER_COMPOSE) down postgres-dev
 
+run:
+	@echo "Starting database"
+	@$(DOCKER_COMPOSE) up postgres-dev -d --wait
+	@echo "Starting server"
+	@$(DOCKER_COMPOSE) up backend-api -d --wait
+
+stop:
+	@echo "Stopping backend server and postgres docker containers..."
+	@$(DOCKER_COMPOSE) stop postgres-dev backend-api
+	@$(DOCKER_COMPOSE) down postgres-dev backend-api
 
 check_clean:
 	@echo "This will remove the database volume. This action is irreversible."
