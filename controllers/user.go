@@ -23,7 +23,7 @@ func Register(c *gin.Context, DB *gorm.DB) {
 	regUser := signUp{}
 
 	if err := c.BindJSON(&regUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "error in request"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error in request"})
 		return
 	}
 
@@ -31,19 +31,19 @@ func Register(c *gin.Context, DB *gorm.DB) {
 	result := DB.Find(&findUser, "email = ?", regUser.Email)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
 
 	if result.RowsAffected != 0 {
-		c.JSON(http.StatusConflict, gin.H{"message": "User already exists"})
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"message": "User already exists"})
 		return
 	}
 
 	hashPswd, err := services.HashPassword(regUser.Pswd)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error hashing password"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Error hashing password"})
 		return
 	}
 
@@ -56,7 +56,7 @@ func Register(c *gin.Context, DB *gorm.DB) {
 	resData := DB.Create(&newUser)
 
 	if resData.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Error creating new user"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Error creating new user"})
 		return
 	}
 
@@ -73,7 +73,7 @@ func Login(c *gin.Context, DB *gorm.DB) {
 	loginUser := Login{}
 
 	if err := c.Bind(&loginUser); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "error in request"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error in request"})
 		return
 	}
 
@@ -81,32 +81,32 @@ func Login(c *gin.Context, DB *gorm.DB) {
 	result := DB.Find(&findUser, "email = ?", loginUser.Email)
 
 	if result.Error != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
 		return
 	}
 
 	if result.RowsAffected == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "No user with the email is not found"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "No user with the email is not found"})
 		return
 	}
 
 	err := bcrypt.CompareHashAndPassword([]byte(findUser.Password), []byte(loginUser.Pswd))
 
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "username or password is wrong"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "username or password is wrong"})
 		return
 	}
 
 	signKey := os.Getenv("JWT_KEY")
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": findUser.Email, "exp": time.Now().Add(time.Hour * 24).Unix()})
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": findUser.Email, "exp": time.Now().Add(time.Hour * 24).Unix(), "userId": findUser.UserId})
 
 	tokenString, err := token.SignedString([]byte(signKey))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "JWT Signing error"})
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "JWT Signing error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Login Successful", "jwt": tokenString})
+	c.JSON(http.StatusOK, gin.H{"message": "Login Successful", "jwt": tokenString, "name": findUser.Name, "profile_url": findUser.Url})
 
 }
