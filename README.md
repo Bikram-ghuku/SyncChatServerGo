@@ -67,8 +67,8 @@ The client can also be built from source for individual platforms.
 
 4. Setup the envrionment
 
-    - Rename the .example.env to .env
-	- Rename the backend .example.env to .env
+    - Copy the `.example.env` to `.env`
+	- Copy the `backend/.example.env` to `backend/.env`
     - Fill the required tokens
 
 Visit the application at: http://localhost:PORT/
