@@ -2,14 +2,16 @@ package routes
 
 import (
 	"github.com/Bikram-ghuku/SyncChatServerGo/controllers"
+	"github.com/Bikram-ghuku/SyncChatServerGo/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func SetupChannelsRoutes(DB *gorm.DB, superRoute *gin.RouterGroup) {
-	userRoutes := superRoute.Group("/channels")
+	channelRoutes := superRoute.Group("/channels")
 	{
-		userRoutes.GET("/", func(ctx *gin.Context) {
+		channelRoutes.Use(middleware.JWTTokenCheck)
+		channelRoutes.GET("/channels", func(ctx *gin.Context) {
 			controllers.GetChannels(ctx, DB)
 		})
 	}
