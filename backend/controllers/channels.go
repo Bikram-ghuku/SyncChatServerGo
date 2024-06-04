@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/Bikram-ghuku/SyncChatServerGo/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -35,7 +36,18 @@ func GetChannels(c *gin.Context, DB *gorm.DB) {
 		panic(err)
 	}
 
-	fmt.Println(claimStruct.Email)
-	fmt.Println(string(data_json))
-	c.JSON(http.StatusOK, gin.H{"data": data})
+	findChannels := models.Chats{}
+	result := DB.Find(&findChannels, "sender_id = ?", claimStruct.UserId)
+
+	if result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
+		return
+	}
+	fmt.Println(result.RowsAffected)
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusOK, gin.H{"data": gin.H{}})
+	} else {
+		c.JSON(http.StatusOK, gin.H{"data": findChannels})
+
+	}
 }
