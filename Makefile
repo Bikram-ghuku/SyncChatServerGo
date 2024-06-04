@@ -1,3 +1,4 @@
+MAKEQ := $(MAKE) --no-print-directory
 BINARY_NAME=SyncChatServer
 
 ifeq (, $(shell which docker-compose))
@@ -9,13 +10,13 @@ endif
 
 default: dev
 
-.PHONY: dev
+.PHONY: dev dev-stop clean check_clean
 
 dev:
 	@echo "Starting database"
 	@$(DOCKER_COMPOSE) up -d --wait
 	@echo "Starting server"
-	go run .
+	@bash -c "go run ."
 	
 dev-stop:
 	@echo ""
