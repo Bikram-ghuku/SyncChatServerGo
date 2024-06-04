@@ -99,7 +99,7 @@ func Login(c *gin.Context, DB *gorm.DB) {
 
 	signKey := os.Getenv("JWT_KEY")
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": findUser.Email, "exp": time.Now().Add(time.Hour * 24).Unix()})
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": findUser.Email, "exp": time.Now().Add(time.Hour * 24).Unix(), "name": findUser.Name, "profile_url": findUser.Url})
 
 	tokenString, err := token.SignedString([]byte(signKey))
 	if err != nil {
