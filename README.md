@@ -60,16 +60,17 @@ The client can also be built from source for individual platforms.
 	    cd ChatSyncWebGo
 	```
 
-2. Start the project
+
+2. Setup the envrionment
+
+    - Copy the `.example.env` to `.env`
+    - Fill the required tokens
+
+
+3. Start the project
 	```shell
 	  make dev
 	```
-
-4. Setup the envrionment
-
-    - Copy the `.example.env` to `.env`
-	- Copy the `backend/.example.env` to `backend/.env`
-    - Fill the required tokens
 
 Visit the application at: http://localhost:PORT/
 
