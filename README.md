@@ -48,7 +48,7 @@ The client can also be built from source for individual platforms.
 #### Prerequisites
 
 - [Git CLI](https://git-scm.com/downloads)
-- [GoLand](https://go.dev/doc/install)
+- [GoLang](https://go.dev/doc/install)
 - [Docker](https://www.docker.com/products/docker-desktop/)
 
 #### Building
