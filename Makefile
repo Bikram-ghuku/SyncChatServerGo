@@ -14,9 +14,9 @@ default: dev
 
 dev:
 	@echo "Starting database"
-	@$(DOCKER_COMPOSE) up -d --wait
+	@$(DOCKER_COMPOSE) up postgres-dev -d --wait
 	@echo "Starting server"
-	@bash -c "trap 'echo "";$(MAKEQ) dev-stop; exit 0' SIGINT SIGTERM ERR; go run .;"
+	@bash -c "trap 'echo "";$(MAKEQ) dev-stop; exit 0' SIGINT SIGTERM ERR; cd backend && go run .;"
 	
 dev-stop:
 	@echo ""
