@@ -2,7 +2,7 @@ services:
   postgres-dev:
     image: postgres:latest
     ports:
-      - 5432:5432
+      - ${PGPORT}:${PGPORT}
     volumes:
       - ./backend/services/init.sql:/docker-entrypoint-initdb.d/init.sql
       - ./data/dev-postgres:/var/lib/postgresql/data
@@ -10,6 +10,7 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_DB=${POSTGRES_DBNAME}
+      - PGPORT=${PGPORT}
     networks:
       database-network:
         aliases:
