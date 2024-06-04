@@ -17,7 +17,8 @@ func InitDB() *gorm.DB {
 	dbname := os.Getenv("POSTGRES_DBNAME")
 	dbuser := os.Getenv("POSTGRES_USER")
 	dbpswd := os.Getenv("POSTGRES_PASSWORD")
-	conn := fmt.Sprintf("postgres://%s:%s@%s/%s", dbuser, dbpswd, dbhost, dbname)
+	dbport := os.Getenv("PGPORT")
+	conn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", dbuser, dbpswd, dbhost, dbport, dbname)
 	fmt.Println(conn)
 	var db, err = gorm.Open(postgres.Open(conn), &gorm.Config{})
 	if err != nil {

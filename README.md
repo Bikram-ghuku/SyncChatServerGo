@@ -48,7 +48,7 @@ The client can also be built from source for individual platforms.
 #### Prerequisites
 
 - [Git CLI](https://git-scm.com/downloads)
-- [GoLand](https://go.dev/doc/install)
+- [GoLang](https://go.dev/doc/install)
 - [Docker](https://www.docker.com/products/docker-desktop/)
 
 #### Building
@@ -60,23 +60,19 @@ The client can also be built from source for individual platforms.
 	    cd ChatSyncWebGo
 	```
 
-2. Setup Docker for PostgreSQL server
-	```shell
-	  docker compose up -d
-	```
 
-3. Run the development server
+2. Setup the envrionment
 
-	```shell
-	    go run .
-	```
-
-4. Setup the envrionment
-
-    - Rename the .example.env to .env
+    - Copy the `.example.env` to `.env`
     - Fill the required tokens
 
-Visit the application at: http://localhost:8080/
+
+3. Start the project
+	```shell
+	  make dev
+	```
+
+Visit the application at: http://localhost:PORT/
 
 
 &nbsp;

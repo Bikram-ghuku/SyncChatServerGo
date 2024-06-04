@@ -44,10 +44,10 @@ func JWTTokenCheck(c *gin.Context) {
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
-		fmt.Println(claims)
+		c.Set("data", claims)
+		c.Next()
 	} else {
 		fmt.Printf("Invalid JWT Token")
 	}
-	c.Set("data", claims)
-	c.Next()
+
 }
