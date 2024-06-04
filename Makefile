@@ -16,7 +16,7 @@ dev:
 	@echo "Starting database"
 	@$(DOCKER_COMPOSE) up -d --wait
 	@echo "Starting server"
-	@bash -c "go run ."
+	@bash -c "trap 'echo "";$(MAKEQ) dev-stop; exit 0' SIGINT SIGTERM ERR; go run .;"
 	
 dev-stop:
 	@echo ""
