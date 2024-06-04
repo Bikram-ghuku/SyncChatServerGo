@@ -60,23 +60,18 @@ The client can also be built from source for individual platforms.
 	    cd ChatSyncWebGo
 	```
 
-2. Setup Docker for PostgreSQL server
+2. Start the project
 	```shell
-	  docker compose up -d
-	```
-
-3. Run the development server
-
-	```shell
-	    go run .
+	  make dev
 	```
 
 4. Setup the envrionment
 
     - Rename the .example.env to .env
+	- Rename the backend .example.env to .env
     - Fill the required tokens
 
-Visit the application at: http://localhost:8080/
+Visit the application at: http://localhost:PORT/
 
 
 &nbsp;
