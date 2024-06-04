@@ -99,7 +99,7 @@ func Login(c *gin.Context, DB *gorm.DB) {
 
 	signKey := os.Getenv("JWT_KEY")
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": findUser.Email, "exp": time.Now().Add(time.Hour * 24).Unix(), "name": findUser.Name, "profile_url": findUser.Url})
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{"email": findUser.Email, "exp": time.Now().Add(time.Hour * 24).Unix(), "userId": findUser.UserId})
 
 	tokenString, err := token.SignedString([]byte(signKey))
 	if err != nil {
@@ -107,6 +107,6 @@ func Login(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Login Successful", "jwt": tokenString})
+	c.JSON(http.StatusOK, gin.H{"message": "Login Successful", "jwt": tokenString, "name": findUser.Name, "profile_url": findUser.Url})
 
 }
