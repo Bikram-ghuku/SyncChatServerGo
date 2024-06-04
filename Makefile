@@ -26,14 +26,14 @@ dev-stop:
 
 run:
 	@echo "Starting database"
-	@$(DOCKER_COMPOSE) up postgres-dev -d --wait
+	@$(DOCKER_COMPOSE) up postgres -d --wait
 	@echo "Starting server"
 	@$(DOCKER_COMPOSE) up backend-api -d --wait
 
 stop:
 	@echo "Stopping backend server and postgres docker containers..."
-	@$(DOCKER_COMPOSE) stop postgres-dev backend-api
-	@$(DOCKER_COMPOSE) down postgres-dev backend-api
+	@$(DOCKER_COMPOSE) stop postgres backend-api
+	@$(DOCKER_COMPOSE) down postgres backend-api
 
 check_clean:
 	@echo "This will remove the database volume. This action is irreversible."
