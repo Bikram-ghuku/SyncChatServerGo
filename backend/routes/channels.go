@@ -14,5 +14,8 @@ func SetupChannelsRoutes(DB *gorm.DB, superRoute *gin.RouterGroup) {
 		channelRoutes.GET("/channels", func(ctx *gin.Context) {
 			controllers.GetChannels(ctx, DB)
 		})
+		channelRoutes.POST("/addChannels", func(ctx *gin.Context) {
+			controllers.AddChannels(ctx, DB)
+		})
 	}
 }
