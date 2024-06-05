@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -109,4 +111,114 @@ func Login(c *gin.Context, DB *gorm.DB) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Login Successful", "jwt": tokenString, "name": findUser.Name, "profile_url": findUser.Url})
 
+}
+
+func GhAuth(c *gin.Context, DB *gorm.DB) {
+	type BodyReg struct {
+		GhCode string `json:"code"`
+	}
+
+	type GithubAccessTokenResponse struct {
+		AccessToken string `json:"access_token"`
+		Scope       string `json:"scope"`
+		TokenType   string `json:"token_type"`
+	}
+
+	type GithubUserResponse struct {
+		Name      string `json:"name"`
+		Login     string `json:"login"`
+		ID        int    `json:"id"`
+		AvatarURL string `json:"avatar_url"`
+	}
+
+	bodyReg := BodyReg{}
+	if err := c.Bind(&bodyReg); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "error in request"})
+		return
+	}
+
+	gh_pubKey := os.Getenv("GH_CLIENT_ID")
+	gh_pvtKey := os.Getenv("GH_PRIVATE_ID")
+	uri := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=$%s&code=%s", gh_pubKey, gh_pvtKey, bodyReg.GhCode)
+
+	req, _ := http.NewRequest("POST", uri, nil)
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+	var tokenResponse GithubAccessTokenResponse
+	if err := json.NewDecoder(resp.Body).Decode(&tokenResponse); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	req, _ = http.NewRequest("GET", "https://api.github.com/user", nil)
+	req.Header.Set("Authorization", "Bearer "+tokenResponse.AccessToken)
+
+	resp, err = client.Do(req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	defer resp.Body.Close()
+
+	var userResponse GithubUserResponse
+	if err := json.NewDecoder(resp.Body).Decode(&userResponse); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	name := userResponse.Name
+	if name == "" {
+		name = userResponse.Login
+	}
+
+	uname := userResponse.Login
+	id := fmt.Sprintf("%d", userResponse.ID)
+	url := userResponse.AvatarURL
+
+	storeUser := models.Users{
+		Email:    uname,
+		Name:     name,
+		Url:      url,
+		Password: id,
+	}
+
+	DB.Create(&storeUser)
+
+	findUser := models.Users{
+		Email: uname,
+	}
+
+	result := DB.Find(&findUser)
+
+	if result.RowsAffected == 0 || findUser.Password != id {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": findUser.Email,
+		"name":  findUser.Name,
+		"id":    findUser.Email,
+	})
+
+	tokenString, err := token.SignedString([]byte(os.Getenv("TOKEN")))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": tokenString,
+		"name":  findUser.Name,
+		"email": findUser.Email,
+		"id":    findUser.Email,
+		"url":   findUser.Url,
+	})
 }

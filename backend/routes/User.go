@@ -16,5 +16,9 @@ func SetupUserRoutes(DB *gorm.DB, superRoute *gin.RouterGroup) {
 		userRoutes.POST("/login", func(ctx *gin.Context) {
 			controllers.Login(ctx, DB)
 		})
+
+		userRoutes.POST("/ghreg", func(ctx *gin.Context) {
+			controllers.GhAuth(ctx, DB)
+		})
 	}
 }
