@@ -139,7 +139,7 @@ func GhAuth(c *gin.Context, DB *gorm.DB) {
 
 	gh_pubKey := os.Getenv("GH_CLIENT_ID")
 	gh_pvtKey := os.Getenv("GH_PRIVATE_ID")
-	uri := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=$%s&code=%s", gh_pubKey, gh_pvtKey, bodyReg.GhCode)
+	uri := fmt.Sprintf("https://github.com/login/oauth/access_token?client_id=%s&client_secret=%s&code=%s", gh_pubKey, gh_pvtKey, bodyReg.GhCode)
 
 	req, _ := http.NewRequest("POST", uri, nil)
 	req.Header.Set("Accept", "application/json")
@@ -188,17 +188,26 @@ func GhAuth(c *gin.Context, DB *gorm.DB) {
 		Url:      url,
 		Password: id,
 	}
-
-	DB.Create(&storeUser)
+	if id != "0" {
+		DB.Create(&storeUser)
+	} else {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Invalid credentials"})
+		return
+	}
 
 	findUser := models.Users{
 		Email: uname,
 	}
 
-	result := DB.Find(&findUser)
+	result := DB.First(&findUser)
 
-	if result.RowsAffected == 0 || findUser.Password != id {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+	if result.Error != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Invalid credentials"})
+		return
+	}
+
+	if findUser.Password != id || result.RowsAffected == 0 {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Invalid credentials"})
 		return
 	}
 
