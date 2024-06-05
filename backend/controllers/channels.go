@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/Bikram-ghuku/SyncChatServerGo/models"
@@ -50,12 +51,7 @@ func GetChannels(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 
-	if result.RowsAffected == 0 {
-		c.JSON(http.StatusOK, gin.H{"data": gin.H{}})
-	} else {
-		c.JSON(http.StatusOK, gin.H{"data": findChannels})
-
-	}
+	c.JSON(http.StatusOK, gin.H{"data": findChannels})
 }
 
 func AddChannels(c *gin.Context, DB *gorm.DB) {
@@ -83,10 +79,17 @@ func AddChannels(c *gin.Context, DB *gorm.DB) {
 		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"message": "No user with the given Email found"})
 		return
 	}
+	type CheckStruct struct {
+		ChatId uuid.UUID `json:"chat_id"`
+		SendId uuid.UUID `json:"sender_id"`
+		RecvId uuid.UUID `json:"receiver_id"`
+	}
+	query := fmt.Sprintf("SELECT DISTINCT a.chat_id as chat_id, a.sender_id as sender_id, b.sender_id as receiver_id FROM chats a INNER JOIN chats b ON a.chat_id = b.chat_id AND a.sender_id != b.sender_id WHERE a.sender_id = '%s' AND b.sender_id = '%s' ", claimsStruct.UserId, findUser.UserId)
 
-	result = DB.Raw("SELECT DISTINCT a.chat_id, a.sender_id, b.sender_id FROM chats_data a INNER JOIN chats_data b ON a.chat_id = b.chat_id AND a.sender_id != b.sender_id WHERE a.sender_id = ? AND b.sender_id = ? ", claimsStruct.UserId, findUser.UserId)
-
-	if result.RowsAffected != 0 {
+	checkData := []CheckStruct{}
+	DB.Raw(query).Scan(&checkData)
+	checkLen := len(checkData)
+	if checkLen != 0 {
 		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"message": "Channel between the users exsists"})
 		return
 	}
