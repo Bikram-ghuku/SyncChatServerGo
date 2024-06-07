@@ -62,7 +62,7 @@ func Register(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
+	c.JSON(http.StatusCreated, gin.H{"message": "User created successfully"})
 
 }
 
@@ -109,7 +109,7 @@ func Login(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Login Successful", "jwt": tokenString, "name": findUser.Name, "profile_url": findUser.Url})
+	c.JSON(http.StatusOK, gin.H{"message": "Login Successful", "jwt": tokenString, "name": findUser.Name, "profile_url": findUser.Url, "email": findUser.Email, "id": findUser.UserId})
 
 }
 
