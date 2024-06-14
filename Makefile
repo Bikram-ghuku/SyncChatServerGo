@@ -16,7 +16,6 @@ dev:
 	@echo "Starting database"
 	@$(DOCKER_COMPOSE) up postgres-dev -d --wait
 	@echo "Starting server"
-	@cp .env backend/.env
 	@bash -c "trap 'echo "";cd ../ && $(MAKEQ) dev-stop; exit 0' SIGINT SIGTERM ERR; cd backend && go run .;"
 
 .PHONY: dev-stop
