@@ -10,9 +10,23 @@ import (
 	"github.com/joho/godotenv"
 )
 
+var (
+	server *socketio.Server
+)
+
+func Handler() {
+	server.OnConnect("/", func(c socketio.Conn) error {
+		fmt.Println("A new User conencted: ", c.ID())
+		return nil
+	})
+	server.OnEvent("/", "message", func(s socketio.Conn, msg string) {
+
+	})
+}
+
 func main() {
 	godotenv.Load()
-	server := socketio.NewServer(nil)
+	server = socketio.NewServer(nil)
 
 	port := os.Getenv("PORT")
 
