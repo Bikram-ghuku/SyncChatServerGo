@@ -1,50 +1,49 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 
-	"github.com/go-redis/redis/v8"
-	socketio "github.com/googollee/go-socket.io"
+	"github.com/gorilla/websocket"
 	"github.com/joho/godotenv"
 )
 
-var (
-	server *socketio.Server
-)
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+}
 
-var redisClient = redis.NewClient(&redis.Options{
-	Addr: "localhost:6379",
-})
+func Handler(res http.ResponseWriter, req *http.Request) {
+	c, err := upgrader.Upgrade(res, req, nil)
+	if err != nil {
+		log.Println(err.Error())
+	}
+	defer c.Close()
 
-var ctx = context.Background()
-
-func Handler() {
-	server.OnConnect("/", func(c socketio.Conn) error {
-		c.SetContext("")
-		fmt.Println("A new User conencted: ", c.ID())
-		return nil
-	})
-	server.OnEvent("/", "message", func(s socketio.Conn, msg string) {
-		if err := redisClient.Publish(ctx, "message", msg).Err(); err != nil {
-			fmt.Println("Error publishing to redis: ", err.Error())
+	for {
+		mt, msg, err := c.ReadMessage()
+		if err != nil {
+			log.Println(err.Error())
+			break
 		}
-	})
+		log.Printf("Received: %s", msg)
+		err = c.WriteMessage(mt, msg)
+		if err != nil {
+			log.Println("write: ", err)
+			break
+		}
+	}
 }
 
 func main() {
 	godotenv.Load()
-	server = socketio.NewServer(nil)
-	Handler()
+	http.HandleFunc("/", Handler)
 	port := os.Getenv("PORT")
-
-	go server.Serve()
-	defer server.Close()
-
-	http.Handle("/", server)
 	log.Printf("Serving at localhost:%s", port)
 	log.Fatal(http.ListenAndServe(fmt.Sprintf("0.0.0.0:%s", port), nil))
 }
