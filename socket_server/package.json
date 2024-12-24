@@ -1,0 +1,16 @@
+{
+  "name": "socket_server",
+  "version": "1.0.0",
+  "description": "Scalable socker server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bikram-ghuku",
+  "license": "MIT",
+  "dependencies": {
+    "kafkajs": "^2.2.4",
+    "socket_server": "file:",
+    "socket.io": "^4.8.1"
+  }
+}

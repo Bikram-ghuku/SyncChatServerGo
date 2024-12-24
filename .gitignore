@@ -21,3 +21,5 @@ data/
 go.work
 .env
 .env.*
+
+node_modules
