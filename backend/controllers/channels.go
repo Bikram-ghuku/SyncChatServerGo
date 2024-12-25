@@ -17,6 +17,16 @@ type ClaimStruct struct {
 	UserId uuid.UUID `json:"userId"`
 }
 
+type CheckStruct struct {
+	Name       string `json:"name" gorm:"column:name"`
+	UserId     string `json:"userId" gorm:"column:user_id"`
+	Url        string `json:"url" gorm:"column:url"`
+	LastOnline string `json:"lastOnline" gorm:"column:last_online"`
+	ChatId     string `json:"chanId" gorm:"column:chat_id"`
+	LastMsg    string `json:"lastMsg" gorm:"column:last_msg"`
+	NumUnread  string `json:"noUnread" gorm:"column:num_unread"`
+}
+
 func getJwtData(c *gin.Context) ClaimStruct {
 	data, present := c.Get("data")
 	if !present {
@@ -43,21 +53,25 @@ func GetChannels(c *gin.Context, DB *gorm.DB) {
 
 	claimsStruct := getJwtData(c)
 
-	type CheckStruct struct {
-		ChatId uuid.UUID `json:"chat_id"`
-		SendId uuid.UUID `json:"sender_id"`
-		RecvId uuid.UUID `json:"receiver_id"`
-	}
-
-	query := fmt.Sprintf("SELECT DISTINCT a.chat_id as chat_id, a.sender_id as sender_id, b.sender_id as receiver_id FROM chats a INNER JOIN chats b ON a.chat_id = b.chat_id AND a.sender_id != b.sender_id WHERE a.sender_id = '%s'", claimsStruct.UserId)
-
-	fmt.Println(query)
-
 	checkData := []CheckStruct{}
 
-	DB.Raw(query).Scan(&checkData)
+	query := `SELECT 
+		a.name, 
+		a.user_id, 
+		a.url as url, 
+		a.last_online, 
+		b.chat_id, 
+		b.last_msg, 
+		0 as num_unread
+		FROM users a 
+		INNER JOIN chats b 
+		ON b.sender_id = a.user_id 
+		WHERE b.chat_id IN (SELECT chat_id FROM chats WHERE sender_id = ?) 
+		AND b.sender_id != ?`
 
-	c.JSON(http.StatusOK, gin.H{"data": checkData})
+	DB.Raw(query, claimsStruct.UserId, claimsStruct.UserId).Scan(&checkData)
+
+	c.JSON(http.StatusOK, checkData)
 }
 
 func AddChannels(c *gin.Context, DB *gorm.DB) {
