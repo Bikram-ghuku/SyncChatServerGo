@@ -30,7 +30,6 @@ export class SocketServer {
                     topic: process.env.KAFKA_TOPIC || "sync-chat-msg",
                     messages: [{value: JSON.stringify(data)}]
                 }).then(() => {
-                    console.log("Sent to kafka successfully");
                 }).catch((err) => console.log("Error: ",err));
             });
 
