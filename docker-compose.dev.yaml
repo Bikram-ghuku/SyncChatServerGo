@@ -52,3 +52,10 @@ services:
     environment:
       - CASSANDRA_USER=admin
       - CASSANDRA_PASSWORD=admin
+
+  pub-sub:
+    container_name: sc-pub-sub
+    image: redis:8.0-M02-alpine
+    restart: always
+    ports:
+      - '6379:6379'
