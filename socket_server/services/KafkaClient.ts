@@ -5,7 +5,9 @@ const kafka = new Kafka({
     brokers: [process.env.KAFKA_BROKERS || "localhost:29092"],
 });
 
-async function initProducer() {
+export const kafkaTopic = process.env.KAFKA_TOPIC || "sync-chat-msg";
+
+export async function initKafkaProducer() {
     const producer: Producer = kafka.producer({
         allowAutoTopicCreation: true,
     });
@@ -18,6 +20,3 @@ async function initProducer() {
         throw error;
     }
 }
-
-
-export default initProducer;
