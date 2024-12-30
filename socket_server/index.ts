@@ -1,36 +1,24 @@
-import { Socket, Server } from "socket.io";
 import initProducer from "./KafkaClient.ts";
-import { Producer } from "kafkajs";
+import { Producer, CompressionTypes } from "kafkajs";
 import express from "express";
 import { createServer } from "node:http";
+import { SocketServer } from "./SocketServer.ts";
 
 let kafkaProducer: Producer;
 const app = express();
 const httpServer = createServer(app);
 
+
+const socketServer = new SocketServer();
+socketServer.init(httpServer);
+const io = socketServer.getIO();
+
 initProducer().then((kafkaProd) => {
     kafkaProducer = kafkaProd;
     console.log("Kafka Client conencted!");
+    socketServer.runListeners(kafkaProducer);
 });
 
-const io = new Server(httpServer, {
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-    },
-});
-
-io.on("connection", (socket) => {
-    console.log(socket.id);
-    socket.on("message", (data) => {
-        kafkaProducer.send({
-            topic: process.env.KAFKA_TOPIC || "sync-chat-msg",
-            messages: [{value: JSON.stringify(data)}]
-        }).then(() => {
-            console.log("Sent to kafka successfully");
-        }).catch((err) => console.log("Error: ",err));
-    })
-});
 
 const PORT = process.env.PORT || 4000;
 httpServer.listen(PORT, () => {
