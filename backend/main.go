@@ -24,6 +24,6 @@ func main() {
 	router := app.Group("/")
 	routes.SetupChannelsRoutes(DB, router)
 	routes.SetupUserRoutes(DB, router)
-
+	routes.SetupMessagesRoutes(DB, router)
 	app.Run()
 }

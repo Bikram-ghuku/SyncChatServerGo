@@ -27,7 +27,7 @@ func InitDB() *gorm.DB {
 
 	DB = db
 	fmt.Println("DB Connection Successful")
-	DB.AutoMigrate(&models.Users{}, &models.Chats{})
+	DB.AutoMigrate(&models.Users{}, &models.Chats{}, &models.Messages{})
 	fmt.Println("Migration Done")
 	return DB
 }
