@@ -36,10 +36,11 @@ export async function initKafkaConsumer() {
 		})
 		await consumer.run({
 			eachMessage: async ({ topic, partition, message }) => {
-				const { jwt, msg, chatId, timestamp } = JSON.parse(
+				const { jwt, msg, chatId, timeStamp } = JSON.parse(
 					message.value?.toString() || '{}'
 				)
-				DB.InsertIntoDB(msg, chatId, jwt, timestamp).catch(err => {
+				const createdAtISO = new Date(timeStamp).toISOString()
+				DB.InsertIntoDB(msg, chatId, jwt, createdAtISO).catch(err => {
 					console.error('Failed to insert message into DB:', err)
 				})
 				console.log({

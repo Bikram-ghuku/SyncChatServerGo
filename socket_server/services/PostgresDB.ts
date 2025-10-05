@@ -24,7 +24,7 @@ function InsertIntoDB(
 	const { userId } = parseJwt(token)
 	const query = `
 		INSERT INTO messages (msg, chat_id, user_id, created_at)
-		VALUES ($1, $2, $3, to_timestamp($4))
+		VALUES ($1, $2, $3, $4)
 	`
 	return pool.query(query, [message, chatId, userId, createdAt])
 }
