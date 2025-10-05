@@ -100,6 +100,11 @@ func AddChannels(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 
+	if findUser.UserId == claimsStruct.UserId {
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"message": "Cannot create chat to yourself"})
+		return
+	}
+
 	type CheckStruct struct {
 		ChatId uuid.UUID `json:"chat_id"`
 		SendId uuid.UUID `json:"sender_id"`
