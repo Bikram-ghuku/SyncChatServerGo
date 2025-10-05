@@ -1,4 +1,4 @@
-import {initKafkaProducer} from "./services/KafkaClient.ts";
+import {initKafkaConsumer, initKafkaProducer} from "./services/KafkaClient.ts";
 import { Producer } from "kafkajs";
 import express from "express";
 import { createServer } from "node:http";
@@ -33,6 +33,13 @@ initRedisConsumer().then((redisConsumer : RedisClientType) => {
         socketServer.emitMessage(message);
     })
 })
+
+initKafkaConsumer().then(() => {
+    console.log("Kafka Consumer is running, but not doing anything yet.");
+}).catch((err) => {
+    console.error("Error initializing Kafka Consumer:", err);
+    process.exit(1);
+});
 
 const PORT = process.env.SOCKET_PORT || 4000;
 httpServer.listen(PORT, () => {
