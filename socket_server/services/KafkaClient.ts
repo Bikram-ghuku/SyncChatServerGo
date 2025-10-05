@@ -2,7 +2,7 @@ import { Kafka, Producer } from "kafkajs";
 
 const kafka = new Kafka({
     clientId: 'socketInjest',
-    brokers: [process.env.KAFKA_BROKERS || "localhost:29092"],
+    brokers: [process.env.KAFKA_BROKERS || "localhost:9092"],
 });
 
 export const kafkaTopic = process.env.KAFKA_TOPIC || "sync-chat-msg";

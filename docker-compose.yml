@@ -40,16 +40,6 @@ services:
       database-network:
         aliases:
           - backend
-  
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      kafka-network:
-        aliases:
-          - zookeeper
     
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -61,6 +51,9 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      CLUSTER_ID: "pYh_fJfISn2vQqW3xGvlTQ" 
+
     networks:
       kafka-network:
         aliases:
