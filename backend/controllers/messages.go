@@ -8,9 +8,13 @@ import (
 	"gorm.io/gorm"
 )
 
+type MessageResponse struct {
+    models.Messages     
+    IsSelf bool `json:"self"`
+}
 func GetMessages(c *gin.Context, DB *gorm.DB) {
-	claims := getJwtData(c)
 
+	claims := getJwtData(c)
 	var msgRequest struct {
 		ChatId string `json:"chatId"`
 		Multi  int16  `json:"multi"`
@@ -22,8 +26,9 @@ func GetMessages(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 
+
 	findMsgs := []models.Messages{}
-	result := DB.Find(&findMsgs, "user_id = ? AND chat_id = ?", claims.UserId, msgRequest.ChatId)
+	result := DB.Where("chat_id = ?",  msgRequest.ChatId).Order("created_at DESC").Find((&findMsgs))
 
 	if result.Error != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "Database error"})
@@ -35,7 +40,15 @@ func GetMessages(c *gin.Context, DB *gorm.DB) {
 		return
 	}
 
+	response := make([]MessageResponse, len(findMsgs))
+	for i, msg := range findMsgs {
+		response[i] = MessageResponse{
+			Messages: msg,
+			IsSelf:   msg.UserId == claims.UserId,
+		}
+	}
 
-	c.JSON(http.StatusOK, findMsgs)
+
+	c.JSON(http.StatusOK, response)
 
 }
