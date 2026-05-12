@@ -217,7 +217,7 @@ func GhAuth(c *gin.Context, DB *gorm.DB) {
 		"id":    findUser.Email,
 	})
 
-	tokenString, err := token.SignedString([]byte(os.Getenv("TOKEN")))
+	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
