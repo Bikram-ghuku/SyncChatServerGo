@@ -1,26 +1,25 @@
 {
-  "name": "socket_server",
-  "version": "1.0.0",
-  "description": "Scalable socker server",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "deno run --allow-env --allow-net --reload --sloppy-imports --env-file index.ts"
-  },
-  "author": "Bikram-ghuku",
-  "license": "MIT",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "kafkajs": "^2.2.4",
-    "pg": "^8.16.3",
-    "redis": "^4.7.0",
-    "socket_server": "file:",
-    "socket.io": "^4.8.1"
-  },
-  "devDependencies": {
-    "@types/pg": "^8.15.5",
-    "@types/redis": "^4.0.10"
-  }
+	"name": "socket_server",
+	"version": "1.0.0",
+	"description": "Scalable socker server",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"dev": "deno run --allow-env --allow-net --reload --sloppy-imports --env-file index.ts"
+	},
+	"author": "Bikram-ghuku",
+	"license": "MIT",
+	"dependencies": {
+		"cors": "^2.8.6",
+		"dotenv": "^16.6.1",
+		"express": "^4.22.2",
+		"kafkajs": "^2.2.4",
+		"pg": "^8.20.0",
+		"redis": "^4.7.1",
+		"socket.io": "^4.8.3",
+		"socket_server": "file:"
+	},
+	"devDependencies": {
+		"@types/pg": "^8.20.0"
+	}
 }
