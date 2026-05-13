@@ -1,7 +1,7 @@
 import { WebSocketServer, WebSocket } from 'ws'
 import { Producer, CompressionTypes } from 'kafkajs'
 import { Server as HTTPServer } from 'node:http'
-import { redisTopic } from './RedisIPC.ts'
+import { redisStream } from './RedisIPC.ts'
 import { kafkaTopic } from './KafkaClient.ts'
 import { RedisClientType } from 'redis'
 
@@ -43,7 +43,7 @@ export class SocketServer {
 					.catch(err => console.log('Error: ', err))
 
 				redisProducer
-					.publish(redisTopic, JSON.stringify(payload))
+					.xAdd(redisStream, '*', { payload: JSON.stringify(payload) })
 					.catch(err => console.log(err))
 			})
 
