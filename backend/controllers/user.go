@@ -214,7 +214,7 @@ func GhAuth(c *gin.Context, DB *gorm.DB) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": findUser.Email,
 		"name":  findUser.Name,
-		"id":    findUser.Email,
+		"userId":    findUser.UserId,
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_KEY")))

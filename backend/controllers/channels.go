@@ -120,7 +120,7 @@ func AddChannels(c *gin.Context, DB *gorm.DB) {
 	checkLen := len(checkData)
 
 	if checkLen != 0 {
-		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"message": "Channel between the users exsists"})
+		c.AbortWithStatusJSON(http.StatusConflict, gin.H{"message": "Channel between the users exists"})
 		return
 	}
 
