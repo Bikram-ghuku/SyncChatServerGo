@@ -14,7 +14,7 @@ const httpServer = createServer(app);
 
 const socketServer = new SocketServer();
 socketServer.init(httpServer);
-const io = socketServer.getIO();
+const wss = socketServer.getWSS();
 
 initRedisProducer().then((redCon : RedisClientType) => {
     redisProducerClient = redCon;
@@ -44,7 +44,7 @@ initKafkaConsumer().then(() => {
 const PORT = process.env.SOCKET_PORT || 4000;
 httpServer.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
-    console.log("Socket.IO server is ready.");
+    console.log("WebSocket server is ready.");
 });
 
 process.on("SIGINT", async () => {
@@ -61,7 +61,7 @@ process.on("SIGINT", async () => {
         await redisProducerClient.disconnect();
     }
 
-    io.close(() => {
+    wss.close(() => {
         process.exit(0);
     });
 });

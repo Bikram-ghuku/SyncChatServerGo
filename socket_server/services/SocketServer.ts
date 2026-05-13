@@ -1,49 +1,71 @@
-import { Server } from "socket.io";
-import { Producer, CompressionTypes } from "kafkajs";
-import { Server as HTTPServer } from "node:http";
-import { redisTopic } from "./RedisIPC.ts";
-import { kafkaTopic } from "./KafkaClient.ts";
-import { RedisClientType } from "redis";
+import { WebSocketServer, WebSocket } from 'ws'
+import { Producer, CompressionTypes } from 'kafkajs'
+import { Server as HTTPServer } from 'node:http'
+import { redisTopic } from './RedisIPC.ts'
+import { kafkaTopic } from './KafkaClient.ts'
+import { RedisClientType } from 'redis'
 
 export class SocketServer {
-    private io : Server;
-    constructor(){
-        this.io = new Server({
-            cors: {
-                origin: "*",
-                methods: ["GET", "POST"],
-            },
-        });
-    }
+	private wss: WebSocketServer | null
+	constructor() {
+		this.wss = null
+	}
 
-    init(httpServer: HTTPServer){
-        this.io.attach(httpServer);
-    }
+	init(httpServer: HTTPServer) {
+		this.wss = new WebSocketServer({ server: httpServer })
+	}
 
-    getIO() {
-        return this.io;
-    }
+	getWSS() {
+		if (!this.wss) {
+			throw new Error('WebSocket server not initialized')
+		}
+		return this.wss
+	}
 
-    runListeners(kafkaProducer : Producer, redisProducer:RedisClientType){
-        this.io.on("connection", (socket) => {
-            console.log(socket.id);
-            socket.on("message", (data) => {
-                kafkaProducer.send({
-                    compression: CompressionTypes.GZIP,
-                    topic: kafkaTopic,
-                    messages: [{value: JSON.stringify(data)}]
-                }).catch((err) => console.log("Error: ",err));
+	runListeners(kafkaProducer: Producer, redisProducer: RedisClientType) {
+		const wss = this.getWSS()
+		wss.on('connection', socket => {
+			socket.on('message', raw => {
+				let parsed: any
+				try {
+					parsed = JSON.parse(raw.toString())
+				} catch {
+					return
+				}
+				const payload = parsed?.type ? parsed.data : parsed
 
-                redisProducer.publish(redisTopic, JSON.stringify(data)).catch((err) => console.log(err));
-            });
+				kafkaProducer
+					.send({
+						compression: CompressionTypes.GZIP,
+						topic: kafkaTopic,
+						messages: [{ value: JSON.stringify(payload) }],
+					})
+					.catch(err => console.log('Error: ', err))
 
-            socket.on("disconnect", () => {
-                console.log(`Client disconnected: ${socket.id}`);
-            });
-        });
-    }
+				redisProducer
+					.publish(redisTopic, JSON.stringify(payload))
+					.catch(err => console.log(err))
+			})
 
-    emitMessage(mesage:string){
-        this.io.emit("message", JSON.parse(mesage));
-    }
+			socket.on('close', () => {
+				console.log('Client disconnected')
+			})
+		})
+	}
+
+	emitMessage(mesage: string) {
+		const wss = this.getWSS()
+		let payload: any
+		try {
+			payload = JSON.parse(mesage)
+		} catch {
+			return
+		}
+		const data = JSON.stringify({ type: 'message', data: payload })
+		wss.clients.forEach(client => {
+			if (client.readyState === WebSocket.OPEN) {
+				client.send(data)
+			}
+		})
+	}
 }

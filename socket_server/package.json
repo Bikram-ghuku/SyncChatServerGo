@@ -16,8 +16,8 @@
 		"kafkajs": "^2.2.4",
 		"pg": "^8.20.0",
 		"redis": "^4.7.1",
-		"socket.io": "^4.8.3",
-		"socket_server": "file:"
+		"socket_server": "file:",
+		"ws": "^8.20.1"
 	},
 	"devDependencies": {
 		"@types/pg": "^8.20.0"
