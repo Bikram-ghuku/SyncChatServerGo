@@ -1,7 +1,9 @@
 import { createClient, RedisClientType } from 'redis'
 
 export const redisStream = process.env.REDIS_STREAM || 'sync-chat-stream'
-export const redisGroup = process.env.REDIS_GROUP || 'sync-chat-group'
+const instanceId = process.env.SOCKET_INSTANCE_ID || process.pid
+export const redisGroup =
+	process.env.REDIS_GROUP || `sync-chat-group-${instanceId}`
 export const redisConsumerName =
 	process.env.REDIS_CONSUMER || `consumer-${process.pid}`
 const url = process.env.REDIS_URL || 'redis://localhost:6379'
