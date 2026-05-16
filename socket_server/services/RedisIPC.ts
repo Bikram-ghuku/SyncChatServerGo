@@ -5,7 +5,7 @@ const instanceId = process.env.SOCKET_INSTANCE_ID || process.pid
 export const redisGroup =
 	process.env.REDIS_GROUP || `sync-chat-group-${instanceId}`
 export const redisConsumerName =
-	process.env.REDIS_CONSUMER || `consumer-${process.pid}`
+	process.env.REDIS_CONSUMER || `consumer-${instanceId}`
 const url = process.env.REDIS_URL || 'redis://localhost:6379'
 
 export async function initRedisProducer() {
